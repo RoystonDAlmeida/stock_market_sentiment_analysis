@@ -1,0 +1,17 @@
+# Install the yfinance module for historical data
+yfinance
+
+# Install streamlit for viewing the UI
+streamlit
+
+# to create the line chart and enable hover functionality.
+plotly
+
+# Pandas package for dataframe processing
+pandas
+
+# Requests module for extracting real-time stock news
+requests
+
+# Use natural language toolkit for data preprocessing
+nltk
