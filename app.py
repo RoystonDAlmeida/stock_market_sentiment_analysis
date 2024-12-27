@@ -5,6 +5,7 @@ from fetch_sentiment_data import fetch_sentiment_data
 from preprocess_text import write_cleaned_contents_to_file
 from perform_sentiment_analysis import get_sentiments_list
 from combine_sentiment_and_stock_data import get_combined_sentiment_and_stock_data
+from train_machine_learning_model import get_model_accuracy
 
 # Set the page configuration
 st.set_page_config(page_title="Stock Market Prediction using Sentiment Analysis", layout="wide")
@@ -108,7 +109,15 @@ if search_term:
 
                             # Combine sentiments_list and stock_data
                             combined_data = get_combined_sentiment_and_stock_data(sentiment_description_list, sentiments_list, results_dataframe)
-                            print(combined_data)
+                            if not combined_data.empty:
+                                # If combined_data dataframe is obtained
+                                try:
+                                    # Get the accuracy score of the model using comined_data
+                                    accuracy_score = get_model_accuracy(combined_data)
+                                    st.title(f"Model Accuracy:{accuracy_score*100:.2f}%")
+
+                                except Exception as e:
+                                    st.error(f"An error occurred while training the model: {str(e)}")
 
                         except Exception as e:
                             st.error(f"An error occurred while processing sentiment data: {str(e)}")
