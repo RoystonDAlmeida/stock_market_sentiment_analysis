@@ -22,7 +22,7 @@ def fetch_sentiment_data(ticker):
     @Returns:- description_list:- list object containing all descriptions for the ticker
     """
 
-    response = requests.get(f"{api_url}?s={ticker.upper()}&offset=0&limit=100&&api_token={api_key}&fmt=json")
+    response = requests.get(f"{api_url}?s={ticker.upper()}&api_token={api_key}&fmt=json")
 
     if response.status_code == 200:
         news_data = response.json()
