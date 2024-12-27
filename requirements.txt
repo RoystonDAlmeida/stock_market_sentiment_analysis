@@ -15,3 +15,6 @@ requests
 
 # Use natural language toolkit for data preprocessing
 nltk
+
+# Install sklearn for training the model
+scikit-learn
