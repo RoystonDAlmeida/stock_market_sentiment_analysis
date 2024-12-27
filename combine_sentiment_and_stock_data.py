@@ -14,14 +14,10 @@ def get_combined_sentiment_and_stock_data(sentiment_description_list,sentiments_
     sentiment_df = pd.DataFrame(sentiments_list)
     sentiment_df['date'] = pd.to_datetime([sentiment_description['date']
                                            for sentiment_description in sentiment_description_list])
-
     sentiment_df['compound'] = sentiment_df['compound'].apply(lambda x:-1 if x>0 else {-1 if x<0 else 0})
 
     # Group by date and calculate mean for numeric columns
     grouped_sentiment = sentiment_df.groupby('date').mean(numeric_only=True).reset_index()
-
-    # Ensure stock_data['Date'] is in datetime format
-    stock_data['Date'] = pd.to_datetime(stock_data['Date'])
 
     # Check if stock_data has a MultiIndex and flatten it if necessary
     if isinstance(stock_data.columns, pd.MultiIndex):
@@ -32,5 +28,5 @@ def get_combined_sentiment_and_stock_data(sentiment_description_list,sentiments_
 
     combined_data = pd.merge(stock_data[['Date', 'Close']], grouped_sentiment,
                              left_on='Date', right_on='date', how='inner')
-
+    # print(combined_data)
     return combined_data
