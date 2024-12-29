@@ -4,6 +4,9 @@ from nltk.sentiment import SentimentIntensityAnalyzer
 # Using the pre-trained VADER model for sentiment analysis
 nltk.download('vader_lexicon')
 
+# Add an empty sentiments_list to store('neg', 'neu', ;pos')
+sentiments_list = []
+
 # Sentiment Intensity Analyzer
 sia = SentimentIntensityAnalyzer()
 
@@ -15,5 +18,15 @@ def get_sentiments_list(sentiment_description_list):
     @Returns:- sentiments_list:- list object containing sentiment of each description
     """
 
-    sentiments_list = [sia.polarity_scores(description['content']) for description in sentiment_description_list]
+    for description in sentiment_description_list:
+
+        combined_score = {
+            'compound':description['sentiment']['polarity'],
+            'neg':description['sentiment']['neg'],
+            'neu':description['sentiment']['neu'],
+            'pos':description['sentiment']['pos']
+        }
+
+        sentiments_list.append(combined_score)
+
     return sentiments_list
