@@ -106,15 +106,22 @@ if search_term:
 
                             # Get the sentiment for each description in sentiments_description_list
                             sentiments_list = get_sentiments_list(sentiment_description_list)
+                            # print(sentiments_list)[Contains {'compound','neg', 'neu', 'pos'}]
 
                             # Combine sentiments_list and stock_data
                             combined_data = get_combined_sentiment_and_stock_data(sentiment_description_list, sentiments_list, results_dataframe)
+
                             if not combined_data.empty:
                                 # If combined_data dataframe is obtained
                                 try:
-                                    # Get the accuracy score of the model using comined_data
-                                    accuracy_score = get_model_accuracy(combined_data)
-                                    st.title(f"Model Accuracy:{accuracy_score*100:.2f}%")
+                                    # Get the model metrics using combined_data
+                                    cv_scores, mae, r2 = get_model_accuracy(combined_data)
+
+                                    # Print the metrics
+                                    st.write(f"**Model Evaluation metrics:**")
+                                    st.write(f"**Cross-validated R-squared**: {cv_scores.mean():.2f}")
+                                    st.write(f"**Mean Absolute Error**: {mae:.2f}")
+                                    st.write(f"**R-squared**: {r2:.2f}")
 
                                 except Exception as e:
                                     st.error(f"An error occurred while training the model: {str(e)}")
