@@ -12,6 +12,10 @@ def get_combined_sentiment_and_stock_data(sentiment_description_list,sentiments_
 
     # Create a Dataframe for sentiment scores with timestamps
     sentiment_df = pd.DataFrame(sentiments_list)
+    # print(sentiment_df)
+    # print(f"Length of sentiments_list: {len(sentiments_list)}")
+    # print(f"Length of sentiment_description_list: {len(sentiment_description_list)}")
+
     sentiment_df['date'] = pd.to_datetime([sentiment_description['date']
                                            for sentiment_description in sentiment_description_list])
     sentiment_df['compound'] = sentiment_df['compound'].apply(lambda x:-1 if x>0 else {-1 if x<0 else 0})
@@ -26,7 +30,7 @@ def get_combined_sentiment_and_stock_data(sentiment_description_list,sentiments_
     # Merge with stock price data on date
     stock_data.reset_index(inplace=True)
 
-    combined_data = pd.merge(stock_data[['Date', 'Close']], grouped_sentiment,
+    combined_data = pd.merge(stock_data[['Date', 'Close', 'High', 'Low', 'Volume']], grouped_sentiment,
                              left_on='Date', right_on='date', how='inner')
     # print(combined_data)
     return combined_data
