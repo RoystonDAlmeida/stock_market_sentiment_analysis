@@ -1,5 +1,5 @@
 import yfinance as yf
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Function to get company name from ticker
 def get_company_name(ticker_name):
@@ -29,17 +29,14 @@ def get_stock_data_and_rows(ticker_name):
                 company_name:- str object containing the company name from ticker name
     """
 
-    # Get today's date
-    today = datetime.today()
+    # Format the last trading date(upto yesterday or previous day) date as 'yyyy-mm-dd'
+    yesterday_date = datetime.today() - timedelta(days=1)
+    formatted_date = yesterday_date.strftime('%Y-%m-%d')
 
-    # Format the date as 'yyyy-mm-dd'
-    formatted_date = today.strftime('%Y-%m-%d')
-
-    # Download stock data
-    stock_data = yf.download(ticker_name, start='2020-01-01', end=formatted_date)
+    # Download stock data(Start from 2021-01-01) upto last trading day(yesterday)
+    stock_data = yf.download(ticker_name, start='2021-01-01', end=formatted_date)
 
     # Getting the total number of rows present in stock_data
     total_rows = stock_data.shape[0]  # or use len(stock_data)
 
     return stock_data, stock_data.head(), total_rows
-
