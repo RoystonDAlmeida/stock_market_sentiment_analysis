@@ -51,10 +51,22 @@ def write_cleaned_contents_to_file(description_list, filename='cleaned_contents.
         writer = csv.writer(f)
 
         # Write the header row
-        writer.writerow(["Date", "Content"])
+        writer.writerow(["Date", "Title", "Content", "polarity", "neg", "neu", "pos"])
+
+        required_keys = ['date', 'title', 'content', 'sentiment']
 
         # Iterate through the description list and write each row
         for description in description_list:
-            created_at = description['date']
-            cleaned_description = preprocess_text(description['content'])
-            writer.writerow([created_at, cleaned_description])
+            # Check if all required keys exist in 'description' and 'sentiment' key is not 'null'
+            if all(key in description for key in required_keys) and description.get('sentiment') is not None:
+                created_at = description['date']
+                title = description['title']
+
+                polarity_value = description['sentiment']['polarity']
+                neg_value = description['sentiment']['neg']
+                neu_value = description['sentiment']['neu']
+                pos_value = description['sentiment']['pos']
+
+                cleaned_description = preprocess_text(description['content'])
+
+                writer.writerow([created_at, title, cleaned_description, polarity_value, neg_value, neu_value, pos_value])
