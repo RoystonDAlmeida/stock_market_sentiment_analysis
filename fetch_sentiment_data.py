@@ -24,7 +24,7 @@ def fetch_sentiment_data(ticker):
     """
 
     # Parse the start date
-    start = datetime.strptime('2021-01-01', '%Y-%m-%d')
+    start = datetime.strptime('2024-01-01', '%Y-%m-%d')
 
     # Get yesterday's date(since training data should be upto previous date)
     yesterday = datetime.today() - timedelta(days=1)
