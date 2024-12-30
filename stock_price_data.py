@@ -33,8 +33,8 @@ def get_stock_data_and_rows(ticker_name):
     yesterday_date = datetime.today() - timedelta(days=1)
     formatted_date = yesterday_date.strftime('%Y-%m-%d')
 
-    # Download stock data(Start from 2021-01-01) upto last trading day(yesterday)
-    stock_data = yf.download(ticker_name, start='2021-01-01', end=formatted_date)
+    # Download stock data(Start from 2024-01-01) upto last trading day(yesterday)
+    stock_data = yf.download(ticker_name, start='2024-01-01', end=formatted_date)
 
     # Getting the total number of rows present in stock_data
     total_rows = stock_data.shape[0]  # or use len(stock_data)
