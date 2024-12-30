@@ -1,11 +1,10 @@
-import numpy as np
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import RidgeCV
 from sklearn.metrics import mean_absolute_error, r2_score
 
-def get_model_accuracy(combined_data):
+def get_model_metrics_and_train_model(combined_data):
     """
     @Args:- combined_data:- dataframe object that contains the columns of both stock data and sentiment data
                             (Date, Close, High, Low, Volume, date, neg, neu, pos)
@@ -18,7 +17,7 @@ def get_model_accuracy(combined_data):
                 v. Calculates metrics(Cross Validation-R2, R2, MAE)
     @Returns:- cv_scores, mae, r2 - float model metrics
     """
-
+    # Feature engineering
     # Calculate daily returns
     combined_data['daily_return'] = combined_data['Close'].pct_change()
 
@@ -75,12 +74,14 @@ def get_model_accuracy(combined_data):
 
     # Use Linear Regression - method that studies the relationship between two variables and is used to predict the value of one variable wrt another.
     # Train Ridge Regression model with cross-validation for hyperparameter tuning
-    model = RidgeCV(alphas=np.logspace(-6, 6, 13), store_cv_values=True)
+    model = RidgeCV(alphas=1.0)
+
+    # Fit model using pipeline
     model.fit(X_train, y_train)
 
     # Evaluate the model using cross-validation on the entire dataset for R-squared
     # Cross validated R-square:- is a statistical measure that rates the model against new or unseen data
-    cv_scores = cross_val_score(model, X_imputed, y, cv=5)
+    cv_scores = cross_val_score(model, X_scaled, y, cv=5)
     print(f"Cross-validated R-squared: {cv_scores.mean():.2f}")
 
     # Evaluate the model on the test set
@@ -98,4 +99,4 @@ def get_model_accuracy(combined_data):
     print(f"Mean Absolute Error: {mae:.2f}")
     print(f"R-squared: {r2:.2f}")
 
-    return cv_scores, mae, r2
+    return cv_scores.mean(), mae, r2
