@@ -1,6 +1,7 @@
 import os
 import requests
 from datetime import datetime, timedelta
+import pytz
 import calendar
 from dotenv import load_dotenv
 
@@ -24,16 +25,25 @@ def fetch_sentiment_data(ticker):
     """
 
     # Parse the start date
-    start = datetime.strptime('2024-01-01', '%Y-%m-%d')
+    start_date = datetime.strptime('2024-01-01', '%Y-%m-%d')
+
+    # Define your timezone
+    timezone = pytz.timezone("US/Eastern")
+
+    # Get current date and time in the specified timezone
+    now_date = datetime.now(timezone)
 
     # Get yesterday's date(since training data should be upto previous date)
-    yesterday = datetime.today() - timedelta(days=1)
+    yesterday_date = now_date - timedelta(days=1)
+
+    # Make start date timezone-aware
+    start_date = timezone.localize(start_date)
 
     # Initialize current date to the first day of the start month
-    current_date = start.replace(day=1)
+    current_date = start_date.replace(day=1)
 
-    while current_date <= yesterday:
-        print(current_date, yesterday)
+    while current_date <= yesterday_date:
+        print(current_date, yesterday_date)
         # Get the last day of the current month
         last_day = calendar.monthrange(current_date.year, current_date.month)[1]
 
@@ -42,7 +52,9 @@ def fetch_sentiment_data(ticker):
         end_of_month = current_date.replace(day=last_day).strftime("%Y-%m-%d")
 
         # Move to the first day of the next month
-        if current_date.month == 12:
+        if current_date.month == 12 and current_date <= yesterday_date:
+            # If it's December and we're still within the range of yesterday, set end_of_month to yesterday's date
+            end_of_month = yesterday_date.strftime("%Y-%m-%d")
             current_date = current_date.replace(year=current_date.year + 1, month=1)
         else:
             current_date = current_date.replace(month=current_date.month + 1)
