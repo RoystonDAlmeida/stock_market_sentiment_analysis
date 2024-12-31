@@ -5,7 +5,11 @@ from fetch_sentiment_data import fetch_sentiment_data
 from preprocess_text import write_cleaned_contents_to_file
 from perform_sentiment_analysis import get_sentiments_list
 from combine_sentiment_and_stock_data import get_combined_sentiment_and_stock_data
-from train_machine_learning_model import get_model_accuracy
+from train_machine_learning_model import get_model_metrics_and_train_model
+from get_last_trading_day_price import get_last_trading_day_price
+from predict_next_trading_day_price import predict_next_trading_day_price
+from trading_day_price_fetcher import fetch_current_stock_price
+from stock_price_plotter import plot_stock_price_and_predictions
 
 # Set the page configuration
 st.set_page_config(page_title="Stock Market Prediction using Sentiment Analysis", layout="wide")
@@ -68,7 +72,7 @@ if search_term:
                             write_cleaned_contents_to_file(sentiment_description_list)
 
                             # Display the title and create a download button for the text file
-                            st.title("Formatted Sentiment Content Results")
+                            st.write("**Formatted Sentiment Content Results**")
 
                             # Load CSS styles for download button with icon
                             st.markdown("""
@@ -114,14 +118,47 @@ if search_term:
                             if not combined_data.empty:
                                 # If combined_data dataframe is obtained
                                 try:
-                                    # Get the model metrics using combined_data
-                                    cv_scores, mae, r2 = get_model_accuracy(combined_data)
+                                    # Get the model metrics, imputer, scaler combined_data and model
+                                    cv_scores, mae, r2, imputer, scaler, combined_data, model = get_model_metrics_and_train_model(combined_data)
 
                                     # Print the metrics
                                     st.write(f"**Model Evaluation metrics:**")
                                     st.write(f"**Cross-validated R-squared**: {cv_scores.mean():.2f}")
                                     st.write(f"**Mean Absolute Error**: {mae:.2f}")
                                     st.write(f"**R-squared**: {r2:.2f}")
+
+                                    st.write(f"**Predicted Price**:")
+                                    if not combined_data.empty and model:
+                                        # If combined_data dataframe is obtained
+                                        try:
+                                            # Assuming 'combined_data' is your DataFrame with stock data.
+                                            last_price, last_date = get_last_trading_day_price(combined_data)
+                                            st.write(f"Last Trading Day: **{last_date}**, Closing Price: **${last_price:.2f}**")
+
+                                            # Get the next day trading price prediction
+                                            predicted_price = predict_next_trading_day_price(combined_data, model, search_term, imputer, scaler)
+
+                                            # Fetch the current stock price of the ticker(if it is a trading day)
+                                            current_price = fetch_current_stock_price(search_term)
+                                            if current_price is not None:
+                                                # If current price is obtained
+                                                st.write(f"Current price for {search_term.upper()}: **${current_price:.2f}**")
+
+                                                # Calculate the difference between actual and predicted prices
+                                                difference = current_price - predicted_price
+
+                                                st.write(f"Predicted Price: {predicted_price:.2f} (Difference: ${difference:.2f})")
+                                            else:
+                                                st.write(f"Predicted Price: {predicted_price:.2f}")
+
+                                            # Plot a graph of Stock price vs time
+                                            plot_stock_price_and_predictions(combined_data)
+
+                                        except Exception as e:
+                                            st.error(f"An error occurred with the model and its combined dataframe: {str(e)}")
+
+                                    else:
+                                        st.warning(f"No combined data obtained for the model")
 
                                 except Exception as e:
                                     st.error(f"An error occurred while training the model: {str(e)}")
