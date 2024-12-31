@@ -16,7 +16,12 @@ def get_model_metrics_and_train_model(combined_data):
                 iv. Uses RidgeCV model to train the model with training data
                 v. Calculates metrics(Cross Validation-R2, R2, MAE)
     @Returns:- cv_scores, mae, r2 - float model metrics
+                imputer:- imputer that replaces missing values with the mean of the column
+                scaler:- scaler used to normalize the features of the dataset
+                combined_data:- dataframe object containing transformed combined dara,
+                model:- model instance used to train
     """
+
     # Feature engineering
     # Calculate daily returns
     combined_data['daily_return'] = combined_data['Close'].pct_change()
@@ -54,7 +59,11 @@ def get_model_metrics_and_train_model(combined_data):
     combined_data['target'] = combined_data['Close'].shift(-1)
 
     # Drop NaN values created by rolling calculations
-    combined_data.dropna(inplace=True)
+    # Fill NaN values using forward fill method to retain the last row of data
+    combined_data.fillna(method='ffill', inplace=True)
+
+    # Drop rows where target is NaN (the last row will have NaN target after shifting)
+    combined_data.dropna(subset=['target'], inplace=True)
     print(combined_data)
 
     # Prepare features and target variable
@@ -99,4 +108,4 @@ def get_model_metrics_and_train_model(combined_data):
     print(f"Mean Absolute Error: {mae:.2f}")
     print(f"R-squared: {r2:.2f}")
 
-    return cv_scores.mean(), mae, r2
+    return cv_scores.mean(), mae, r2, imputer, scaler, combined_data, model
