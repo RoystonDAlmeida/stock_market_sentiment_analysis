@@ -4,9 +4,6 @@ yfinance
 # Install streamlit for viewing the UI
 streamlit
 
-# to create the line chart and enable hover functionality.
-plotly
-
 # Pandas package for dataframe processing
 pandas
 
